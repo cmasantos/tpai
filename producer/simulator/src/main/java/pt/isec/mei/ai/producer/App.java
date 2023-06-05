@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 /**
@@ -33,17 +34,20 @@ public class App
                 "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer",
                 "org.apache.kafka.common.serialization.StringSerializer");
- 
+
        final Producer<String, String> producer = new KafkaProducer<String, String>(props);
 
-       final var coords = Map.of(1.1, 1.1, 38.757438, -9.163719);
+       var id = new AtomicInteger(1);
 
        Runnable runnable = () -> {
-           System.out.println("starting");
-           var id = UUID.randomUUID().toString();
+           var sensorId = id.incrementAndGet();
+
+           var sensorKey = "s" + sensorId;
+
+           System.out.println("starting " + sensorId);
            int i = 0;
            Random random = new Random();
-           while (i< 1000) {
+           while (i< 10) {
                i++;
 
                var lat = 1.1;
@@ -60,11 +64,13 @@ public class App
                                        "latitude"  : %f,
                                        "longitude" : %f
                                   }
-                               """.formatted(id, lat, lng);
-               var record = new ProducerRecord<String, String>(
+                               """.formatted(sensorId, lat, lng);
+
+                var record = new ProducerRecord<String, String>(
                        "sensor-location-events",
-                       "1",
+                        sensorKey,
                        payload);
+
                producer.send(record);
 
                try {
@@ -73,12 +79,12 @@ public class App
                }
 
            }
-           System.out.println("finishing");
+           System.out.println("finishing " + sensorId);
        };
 
         ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
-        IntStream.range(0, 10000).forEach(i -> executorService.submit(runnable));
+        IntStream.range(0, 100).forEach(i -> executorService.submit(runnable));
 
            executorService.shutdown();
             try {

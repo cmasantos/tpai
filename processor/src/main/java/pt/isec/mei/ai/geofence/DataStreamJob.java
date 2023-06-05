@@ -43,11 +43,16 @@ public class DataStreamJob {
 				.build();
 
 
-		DataStream<GeofenceEvent> dataStream = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "Kafka Source")
+		DataStream<GeofenceEvent> dataStream =
+				env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "Kafka Source")
 				.keyBy(SensorLocation::getSensorId)
-				.process(new GeofenceOperator());
+				.process(new GeofenceOperator())
+				.uid("geofence_operator_v1")
+				.name("geofence_operator_v1");
 
-		dataStream.sinkTo(sink);
+		dataStream.sinkTo(sink)
+				.uid("geofence_event_sink_v1")
+				.name("geofence_event_sink_v1");
 
 		dataStream.sinkTo(new Sink<GeofenceEvent>() {
 			@Override
