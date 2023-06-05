@@ -4,6 +4,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
@@ -22,6 +23,8 @@ public class App
 {
     public static void main( String[] args )
     {
+        System.out.println("start at " + Instant.now());
+
         Properties props = new Properties();
 
         props.put("bootstrap.servers", "localhost:29092");
@@ -47,7 +50,7 @@ public class App
            System.out.println("starting " + sensorId);
            int i = 0;
            Random random = new Random();
-           while (i< 10) {
+           while (i< 100) {
                i++;
 
                var lat = 1.1;
@@ -84,7 +87,7 @@ public class App
 
         ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
-        IntStream.range(0, 100).forEach(i -> executorService.submit(runnable));
+        IntStream.range(0, 10000).forEach(i -> executorService.submit(runnable));
 
            executorService.shutdown();
             try {
@@ -95,6 +98,8 @@ public class App
 
         System.out.println("Message sent successfully");
         producer.close();
+
+        System.out.println("Stop at " + Instant.now());
     }
 
 }

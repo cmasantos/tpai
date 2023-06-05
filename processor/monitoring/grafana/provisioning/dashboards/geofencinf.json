@@ -93,18 +93,6 @@
           "interval": "",
           "legendFormat": "",
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "exemplar": true,
-          "expr": "flink_taskmanager_job_task_operator_numRecordsOutPerSe",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "B"
         }
       ],
       "title": "Sensor location kafka source total",
@@ -166,18 +154,6 @@
           "interval": "",
           "legendFormat": "",
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "exemplar": true,
-          "expr": "flink_taskmanager_job_task_operator_numRecordsOutPerSe",
-          "hide": false,
-          "interval": "",
-          "legendFormat": "",
-          "refId": "B"
         }
       ],
       "title": "Geofence evens kafka sink  total",
@@ -467,7 +443,7 @@
           "refId": "A"
         }
       ],
-      "title": "Geofence evens kafka sink per second",
+      "title": "Kafka lag",
       "type": "timeseries"
     },
     {
@@ -581,7 +557,7 @@
           "refId": "A"
         }
       ],
-      "title": "Sensor location kafka source per second",
+      "title": "Geofence operator out per second",
       "type": "timeseries"
     }
   ],
@@ -593,7 +569,7 @@
     "list": []
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
