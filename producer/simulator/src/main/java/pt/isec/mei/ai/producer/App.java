@@ -4,16 +4,21 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.Map;
+import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Hello world!
@@ -21,8 +26,7 @@ import java.util.stream.IntStream;
  */
 public class App 
 {
-    public static void main( String[] args )
-    {
+    public static void main( String[] args ) throws IOException {
         System.out.println("start at " + Instant.now());
 
         Properties props = new Properties();
@@ -42,6 +46,8 @@ public class App
 
        var id = new AtomicInteger(1);
 
+       final var coords = getCoords();
+
        Runnable runnable = () -> {
            var sensorId = id.incrementAndGet();
 
@@ -53,19 +59,21 @@ public class App
            while (i< 100) {
                i++;
 
-               var lat = 1.1;
-               var lng = 1.1;
+               var lat = "1.1";
+               var lng = "1.1";
 
                 if(random.nextInt(1,101) > 70) {
-                    lat = 38.757438;
-                    lng = -9.163719;
+                    int index = random.nextInt(0, coords.size());
+                    var gps = coords.get(index);
+                    lat = gps.getLat();
+                    lng = gps.getLng();
                 }
-
+ 
                 var payload = """
                                   {
                                        "sensorId"  : "%s",
-                                       "latitude"  : %f,
-                                       "longitude" : %f
+                                       "latitude"  : %s,
+                                       "longitude" : %s
                                   }
                                """.formatted(sensorId, lat, lng);
 
@@ -102,4 +110,15 @@ public class App
         System.out.println("Stop at " + Instant.now());
     }
 
+    private static List<Gps> getCoords() throws IOException {
+
+        Path path = Paths.get("src/main/resources/valid_gps.csv");
+
+        return Files.readAllLines(path)
+                .stream()
+                .skip(1)
+                .map(line -> line.split(","))
+                .map(line -> new Gps(line[0], line[1]))
+                .collect(toList());
+    }
 }
