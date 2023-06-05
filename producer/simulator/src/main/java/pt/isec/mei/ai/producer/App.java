@@ -33,14 +33,7 @@ public class App
                 "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer",
                 "org.apache.kafka.common.serialization.StringSerializer");
-        var payloadx = """
-                                  {
-                                       "sensorId"  : "1",
-                                       "latitude"  : %f,
-                                       "longitude" : %f
-                                  }
-                               """.formatted(1.2, 2.2);
-        System.out.println(payloadx);
+ 
        final Producer<String, String> producer = new KafkaProducer<String, String>(props);
 
        final var coords = Map.of(1.1, 1.1, 38.757438, -9.163719);
