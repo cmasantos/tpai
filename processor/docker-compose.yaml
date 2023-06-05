@@ -1,0 +1,89 @@
+version: "3.8"
+
+services:
+  jobmanager:
+    container_name: jobmanager
+    build: .
+    depends_on:
+      - init-kafka
+    ports:
+      - 8081:8081
+    command:
+      - standalone-job
+      - job-classname pt.isec.mei.ai.geofence.DataStreamJob
+    environment:
+      FLINK_PROPERTIES: "jobmanager.rpc.address: jobmanager"
+    
+  taskmanager:
+    build: .
+    depends_on:
+      - jobmanager
+      - init-kafka
+    command: taskmanager
+    scale: 3
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2  
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  broker:
+    image: confluentinc/cp-enterprise-kafka:latest
+    container_name: broker
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+      - 29092:29092
+    environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_HOST://localhost:29092
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+        KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  redpanda:
+    image: docker.redpanda.com/vectorized/console:latest
+    container_name: redpanda
+    depends_on:
+      - broker
+    ports:
+      - 8181:8080
+    environment:
+      KAFKA_BROKERS: broker:9092
+
+  init-kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - kafka
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server broker:9092 --list
+      
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic sensor-location-events --replication-factor 1 --partitions 16
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic geofencing-events      --replication-factor 1 --partitions 16
+      
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server broker:9092 --list
+      "
+
+  logs:
+    container_name:  logs
+    image: amir20/dozzle:latest
+    ports:
+      - 8080:8080
+    volumes:
+      - //var/run/docker.sock:/var/run/docker.sock

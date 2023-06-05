@@ -1,0 +1,10 @@
+pt\isec\mei\ai\geofence\deserializer\SensorLocationDeserializer.class
+pt\isec\mei\ai\geofence\model\SensorLocation.class
+pt\isec\mei\ai\geofence\operators\GeofenceOperator$1.class
+pt\isec\mei\ai\geofence\operators\GeofenceOperator.class
+pt\isec\mei\ai\geofence\enums\GeofenceEventTypes.class
+pt\isec\mei\ai\geofence\DataStreamJob$1$1.class
+pt\isec\mei\ai\geofence\DataStreamJob$1.class
+pt\isec\mei\ai\geofence\DataStreamJob.class
+pt\isec\mei\ai\geofence\model\GeofenceEvent.class
+pt\isec\mei\ai\geofence\serializer\GeofenceEventSerializer.class
