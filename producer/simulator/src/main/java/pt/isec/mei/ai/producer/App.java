@@ -49,26 +49,30 @@ public class App
        final var coords = getCoords();
 
        Runnable runnable = () -> {
-           var sensorId = id.incrementAndGet();
+           var sensorId = id.getAndIncrement();
 
            var sensorKey = "s" + sensorId;
 
            System.out.println("starting " + sensorId);
+
            int i = 0;
            Random random = new Random();
-           while (i< 100) {
+           while (i< 300) {
                i++;
+
+               if(sensorId == 1)
+                   System.out.println("i " + i);
 
                var lat = "1.1";
                var lng = "1.1";
 
-                if(random.nextInt(1,101) > 70) {
+                if(random.nextInt(1,101) > 90) {
                     int index = random.nextInt(0, coords.size());
                     var gps = coords.get(index);
                     lat = gps.getLat();
                     lng = gps.getLng();
                 }
- 
+
                 var payload = """
                                   {
                                        "sensorId"  : "%s",
@@ -95,12 +99,12 @@ public class App
 
         ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
-        IntStream.range(0, 10000).forEach(i -> executorService.submit(runnable));
+        IntStream.range(0, 100000).forEach(i -> executorService.submit(runnable));
 
            executorService.shutdown();
             try {
 
-                executorService.awaitTermination(1, TimeUnit.MINUTES);
+                executorService.awaitTermination(10, TimeUnit.MINUTES);
             }catch (InterruptedException e) {
             }
 

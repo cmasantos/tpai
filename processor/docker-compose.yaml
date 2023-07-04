@@ -105,8 +105,8 @@ services:
       kafka-topics --bootstrap-server broker:9092 --list
       
       echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic sensor-location-events --replication-factor 1 --partitions 16
-      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic geofencing-events      --replication-factor 1 --partitions 16
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic sensor-location-events --replication-factor 1 --partitions 32
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic geofencing-events      --replication-factor 1 --partitions 32
       
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server broker:9092 --list
